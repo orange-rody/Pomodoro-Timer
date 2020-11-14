@@ -21,19 +21,20 @@ class Timer extends Component{
   }
 
   startTimer(){
-    const timerId = setInterval(()=>{
-      if(this.state.remainTime===0){
+    const timerId = setInterval(() => {
+      if(this.state.remainTime === 0){
         this.setState({
-          label:'Time Up!!'
+          label: 'Time Up!!'
         });
         clearInterval(timerId);
       }else{
         this.setState((state)=>{
           return{
-            remainTime: --state.remainTime,
-            label:`${Math.floor(state.remainTime / 60)}:${state.remainTime % 60}`
-          };
-        });  
+            remainTime: -- state.remainTime,
+            label:`${('0' + String(Math.floor(state.remainTime / 60))).slice(-2)}:${('0' + String(Math.floor(state.remainTime % 60))).slice(-2)}` 
+          }
+        });
+        console.log(this.state.label);
       }
     },1000);
   }
