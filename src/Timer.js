@@ -4,12 +4,13 @@ class Timer extends Component{
   constructor(props){
     super(props);
     this.state = {
-      remainTime: 1500,  // 初期のremainTime(=残り時間)は25分(=1500秒)とします。
-      label: '25:00'
+      remainTime: 10,  // 初期のremainTime(=残り時間)は25分(=1500秒)とします。
+      label: '00:10'
     };
     //startTimer()とstopTimer()にthisをバインドして、this.timerIdを読み取れるようにします。
     this.startTimer = this.startTimer.bind(this);
     this.stopTimer = this.stopTimer.bind(this);
+    this.resetTimer = this.resetTimer.bind(this);
   }
   
   timerStyle = {
@@ -66,11 +67,20 @@ class Timer extends Component{
     clearInterval(this.timerId);
   }
 
+  resetTimer(){
+    clearInterval(this.timerId);
+    this.setState({
+      remainTime: 10,
+      label: '00:10'
+    });
+  }
+
   render(){
     return <div>
       <p style={this.timerStyle}>{this.state.label}</p>
       <p style={this.btnStyle} onClick={this.startTimer}>スタート</p>
       <p style={this.btnStyle} onClick={this.stopTimer}>ストップ</p>
+      <p style={this.btnStyle} onClick={this.resetTimer}>リセット</p>
     </div>
   }
 }
