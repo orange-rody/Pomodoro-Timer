@@ -3,14 +3,10 @@ import './App.css';
 import Timer from './Timer';
 
 class App extends Component {
-  timer={
-    color:"hsl(213,100%,69%)",
-    fontSize:"25px"
-  }
   render(){
     return(
       <div className="window">
-        <Timer style={this.timer} />
+        <Timer className = 'timer' remainTime = {Number('1')} />
       </div>
     )
   }
