@@ -6,7 +6,7 @@ class App extends Component {
   render(){
     return(
       <div className="window">
-        <Timer className = 'timer' remainTime = {Number('1')} />
+        <Timer className = 'timer' remainTime = {Number('25')}/>
       </div>
     )
   }
