@@ -4,6 +4,7 @@ class Timer extends Component{
   constructor(props){
     super(props);
     this.state={
+      cycle:props.cycle,
       // 初期のremainTime(=残り時間)はprops.remainTimeから取得します。
       remainTime:props.remainTime*60,  
       // 初期のremainTime(=残り時間)から「分」を取得して、文字盤へ表示するために調整します。
@@ -22,7 +23,15 @@ class Timer extends Component{
     fontSize:'60px',
     color:'hsl(213,100%,70%)',
     textAlign:'center',
-    padding:'50px',
+    padding:'50px 50px 0px 50px',
+    margin:'0'
+  }
+
+  cycleStyle={
+    fontSize:'30px',
+    color:'hsl(213,100%,70%)',
+    textAlign:'center',
+    paddingBottom: '50px', 
     margin:'0'
   }
 
@@ -127,11 +136,14 @@ class Timer extends Component{
   }
 
   render(){
-    return <div className={this.props.className}> 
-      <p style={this.clockStyle}>{this.state.clockBoard}</p>
-      <p id="button" style={this.btnStyle} onMouseEnter={this.btnHover} onMouseLeave={this.btnLeave} onClick={this.handleTimer}>{this.state.btnMessage}</p>
-      <p id="resetButton" style={this.btnStyle} onMouseEnter={this.resetButtonHover} onMouseLeave={this.btnLeave} onClick={this.resetTimer}>RESET</p>
-    </div>
+    return(
+      <div className={this.props.className}> 
+        <p style={this.clockStyle}>{this.state.clockBoard}</p>
+        <p style={this.cycleStyle}>{this.state.cycle}</p>
+        <p id="button" style={this.btnStyle} onMouseEnter={this.btnHover} onMouseLeave={this.btnLeave} onClick={this.handleTimer}>{this.state.btnMessage}</p>
+        <p id="resetButton" style={this.btnStyle} onMouseEnter={this.resetButtonHover} onMouseLeave={this.btnLeave} onClick={this.resetTimer}>RESET</p>
+      </div>
+    );
   }
 }
 
