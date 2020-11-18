@@ -9,8 +9,8 @@ class App extends Component {
     super(props);
     this.state={
       cycle:'Focus',
-      focusTime:'25',
-      breakTime:'5',
+      focusTime:25,
+      breakTime:5,
       sound:'on'
     }
   }
@@ -26,7 +26,7 @@ class App extends Component {
   render(){
     return(
       <div className="window">
-        <Timer className = 'timer' remainTime = {this.state.focusTime} cycle={this.state.cycle}/>
+        <Timer className = 'timer' totalTime = {this.state.focusTime*60} cycle={this.state.cycle}/>
         <TimerControllers/>
         <Sound setSound={this.setSound} sound={this.state.sound}/>
       </div>

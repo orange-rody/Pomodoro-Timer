@@ -5,20 +5,23 @@ class Timer extends Component{
     super(props);
     this.state={
       cycle:props.cycle,
-      // 初期のremainTime(=残り時間)はprops.remainTimeから取得します。
-      remainTime:props.remainTime*60,  
-      // 初期のremainTime(=残り時間)から「分」を取得して、文字盤へ表示するために調整します。
-      clockBoard:`${('0' + String(props.remainTime)).slice(-2)}:00`,
-      startButton:'false',
-      btnMessage:'START'
+      // 初期のremainTime(=残り時間)はprops.totalTimeから取得。
+      remainTime:props.totalTime,  
+      startButton:true,
+      btnMessage:'START',
+      // props.totalTimeには「秒」の合計が入っているので、60で割って「分」にする。
+      clockBoard:`${('0' + String(Math.floor(props.totalTime / 60))).slice(-2)}:00`
     };
-    //startTimer()とstopTimer()にthisをバインドして、this.timerIdを読み取れるようにします。
+    //thisをバインドして、それぞれのメソッドが正常にthisの値を取得できるようにする。
     this.handleTimer=this.handleTimer.bind(this);
     this.startTimer=this.startTimer.bind(this);
     this.stopTimer=this.stopTimer.bind(this);
     this.resetTimer=this.resetTimer.bind(this);
+    this.params=this.params.bind(this);
+    this.clockBoard=this.clockBoard.bind(this);
   }
-  
+
+
   clockStyle={
     fontSize:'60px',
     color:'hsl(213,100%,70%)',
@@ -64,23 +67,29 @@ class Timer extends Component{
     resetButton.style.outline='none';
   }
 
-  handleTimer(){
-    if(this.state.startButton===false){
-      this.startTimer();
-      this.setState({
-        startButton:true,
-        btnMessage:'STOP'
-      });
-    }else{
-      this.stopTimer();
-      this.setState({
-        startButton:false,
-        btnMessage:'START'
-      });
+ //stateの真偽値によって、プロパティを変更してreturnする関数paramsを定義する
+  params(state=true){
+    return{
+      startButton: state,
+      btnMessage: state ? 'START':'STOP',
     }
   }
 
+  //startButtonがtrueならstartTimer()を、falseならstopTimer()を起動する。
+   handleTimer(){
+    this.state.startButton === true? this.startTimer():this.stopTimer()
+  }
+
+  clockBoard(){
+      return(
+        `${('0'+String(Math.floor(this.state.remainTime / 60))).slice(-2)}:${('0'+String(Math.floor(this.state.remainTime % 60))).slice(-2)}`
+      );
+  }
+  
+
   startTimer(){
+    //startTimerが起動したら、params()でstartButtonとbtnMessageの内容を書き換える。
+    this.setState(this.params(false));
      // setInterval()を使用し、1000ミリ秒ごとにthis.state.remainTimeが更新されるようにします。
     this.timerId=setInterval(()=>{
       // remainTimeが0になったらclearInterval()で処理をストップさせます。
@@ -88,52 +97,38 @@ class Timer extends Component{
         this.setState({
           clockBoard:'Time Up!!', 
           //カウントが0になったら、ボタンの内容を「START」に切り替えます。
-          startButton:false,
+          startButton:true,
           btnMessage:'START'
         });
         clearInterval(this.timerId);
       }else{
         this.setState((state)=>{
           return{
-            /* 
-            「--(デクリメント演算子)」を書く位置に注意が必要です。
-            「--」を変数の前に書いたら前置処理(処理を行ってから代入)、後に書いたら後置処理(代入してから処理となります。
-            後置処理の場合、処理の結果は変数に反映されません。
-            */
-           remainTime:--state.remainTime,
-            /* 
-            Math.floor(state.remainTime/60)で「分」を、Math.floor(state.remainMin)で「秒」をそれぞれ算出します。
-            「分」と「秒」をそのままの形でcloackBoardにsetState()してしまうと、例えば9分4秒は「9:4」と一桁で表示されてしまうので、「09:04」といった風に二桁で表示されるようにする必要があります。
-            「分」と「秒」がそれぞれ10秒未満となるか否かでif文を書くこともできますが、コードの量が増えてしまうので別の方法をとります。
-            ① String()を使って、Math.floor以下を文字列型に変換します。
-            ② Math.floor~に'0'をくっつけます。
-            ③ ①と②で作った文字列からslice()を使って、引数に(-2)を指定し、最後から数えて二つ目以降の文字を取り出します。
-               例：[10分15秒の場合] 010:015 => 10:15
-                   [ 9分 4秒の場合]  09: 04 => 09:04
-                   slice()で終了インデックスを省略した場合は、「開始インデックス以降の全ての文字を取り出す」という処理を行います。
-            */
-            clockBoard:`${('0'+String(Math.floor(state.remainTime / 60))).slice(-2)}:${('0'+String(Math.floor(state.remainTime % 60))).slice(-2)}` 
+            remainTime:--state.remainTime,
+            clockBoard: this.clockBoard()
           }
-        }); 
+        })
       }
     },1000);
   }
 
   stopTimer(){
-    //stopTimerのclearIntervalでカウントダウン処理をストップさせます。
+    //stopTimerが起動したら、params()でstartButtonとbtnMessageの内容を書き換える。
+    this.setState(this.params(true));
+    //clearIntervalでカウントダウン処理をストップさせる。
     clearInterval(this.timerId);
   }
 
   resetTimer(){
-    //リセットボタンを押したら、カウントダウン処理をストップさせた後、stateの内容を初期値に戻します。
+    //resetTimerが起動したら、setIntervalの処理をストップさせた後、stateの内容を切り替える。
     clearInterval(this.timerId);
     this.setState({
-      remainTime:this.props.remainTime*60,
-      clockBoard:`${('0' + String(this.props.remainTime)).slice(-2)}:00`,
-      start:false,
-      btnMessage:'START'
+      remainTime: this.props.totalTime,
+      clockBoard:`${('0' + String(Math.floor(this.props.totalTime / 60))).slice(-2)}:00`,
     });
-  }
+    this.setState(this.params(true));
+  };
+  
 
   render(){
     return(

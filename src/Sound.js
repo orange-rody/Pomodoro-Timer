@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import soundOff from './Assets/soundOff.png';
+import soundOn from './Assets/soundOff.png';
 
 class Sound extends Component{
   
@@ -9,6 +11,10 @@ class Sound extends Component{
     this.props.setSound('off') :
     this.props.setSound('on')
   }
+
+  
+
+
   render(){
     return(
       <button onClick={this.toggleSound}>SOUND</button>
