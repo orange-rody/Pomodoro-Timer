@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+//react-soundをインポートし、audioデータを再生できるようにする。
+import Sound from 'react-sound';
 
 class Timer extends Component{
   constructor(props){
@@ -10,7 +12,8 @@ class Timer extends Component{
       startButton:true,
       btnMessage:'START',
       // props.totalTimeには「秒」の合計が入っているので、60で割って「分」にする。
-      clockBoard:`${('0' + String(Math.floor(props.totalTime / 60))).slice(-2)}:00`
+      clockBoard:`${('0' + String(Math.floor(props.totalTime / 60))).slice(-2)}:${('0'+String(props.totalTime %60)).slice(-2)}`,
+      status: Sound.status.STOPPED
     };
     //thisをバインドして、それぞれのメソッドが正常にthisの値を取得できるようにする。
     this.handleTimer=this.handleTimer.bind(this);
@@ -19,52 +22,6 @@ class Timer extends Component{
     this.resetTimer=this.resetTimer.bind(this);
     this.params=this.params.bind(this);
     this.clockBoard=this.clockBoard.bind(this);
-  }
-
-
-  clockStyle={
-    fontSize:'60px',
-    color:'hsl(213,100%,70%)',
-    textAlign:'center',
-    padding:'50px 50px 0px 50px',
-    margin:'0'
-  }
-
-  cycleStyle={
-    fontSize:'30px',
-    color:'hsl(213,100%,70%)',
-    textAlign:'center',
-    paddingBottom: '50px', 
-    margin:'0'
-  }
-
-  btnStyle={
-    fontSize:'15px',
-    width:'80px',
-    padding:'10px',
-    margin:'20px auto',
-    textAlign:'center',
-    color:'#fff',
-    backgroundColor:'hsl(213,80%,60%)',
-    cursor:'pointer'
-  }
-
-  btnHover(){
-    const button = document.getElementById('button');
-    button.style.outline='solid 5px hsl(213,80%,80%)';
-    button.style.outlineOffset='-5px';
-  }
-  resetButtonHover(){
-    const resetButton = document.getElementById('resetButton');
-    resetButton.style.outline='solid 5px hsl(213,80%,80%)';
-    resetButton.style.outlineOffset='-5px';
-  }
-
-  btnLeave(){
-    const button = document.getElementById('button');
-    button.style.outline='none';
-    const resetButton = document.getElementById('resetButton');
-    resetButton.style.outline='none';
   }
 
  //stateの真偽値によって、プロパティを変更してreturnする関数paramsを定義する
@@ -82,7 +39,7 @@ class Timer extends Component{
 
   clockBoard(){
       return(
-        `${('0'+String(Math.floor(this.state.remainTime / 60))).slice(-2)}:${('0'+String(Math.floor(this.state.remainTime % 60))).slice(-2)}`
+        `${('0' + String(Math.floor(this.state.remainTime / 60))).slice(-2)}:${('0'+String(this.state.remainTime %60)).slice(-2)}`
       );
   }
   
@@ -90,6 +47,9 @@ class Timer extends Component{
   startTimer(){
     //startTimerが起動したら、params()でstartButtonとbtnMessageの内容を書き換える。
     this.setState(this.params(false));
+    this.setState({
+      status:Sound.status.STOPPED
+    })
      // setInterval()を使用し、1000ミリ秒ごとにthis.state.remainTimeが更新されるようにします。
     this.timerId=setInterval(()=>{
       // remainTimeが0になったらclearInterval()で処理をストップさせます。
@@ -98,8 +58,14 @@ class Timer extends Component{
           clockBoard:'Time Up!!', 
           //カウントが0になったら、ボタンの内容を「START」に切り替えます。
           startButton:true,
-          btnMessage:'START'
+          btnMessage:'START',
+          remainTime: this.props.totalTime,
         });
+        if(this.props.sound===true){
+          this.setState({
+            status: Sound.status.PLAYING
+          });
+        }
         clearInterval(this.timerId);
       }else{
         this.setState((state)=>{
@@ -124,19 +90,70 @@ class Timer extends Component{
     clearInterval(this.timerId);
     this.setState({
       remainTime: this.props.totalTime,
-      clockBoard:`${('0' + String(Math.floor(this.props.totalTime / 60))).slice(-2)}:00`,
+      clockBoard:`${('0' + String(Math.floor(this.props.totalTime / 60))).slice(-2)}:${(('0'+String(this.props.totalTime % 60)).slice(-2))}`,
     });
     this.setState(this.params(true));
+    this.setState({
+      status: Sound.status.STOPPED
+    })
   };
   
 
   render(){
     return(
       <div className={this.props.className}> 
-        <p style={this.clockStyle}>{this.state.clockBoard}</p>
-        <p style={this.cycleStyle}>{this.state.cycle}</p>
-        <p id="button" style={this.btnStyle} onMouseEnter={this.btnHover} onMouseLeave={this.btnLeave} onClick={this.handleTimer}>{this.state.btnMessage}</p>
-        <p id="resetButton" style={this.btnStyle} onMouseEnter={this.resetButtonHover} onMouseLeave={this.btnLeave} onClick={this.resetTimer}>RESET</p>
+      <style jsx>{`
+        div{
+          width: 100%;
+          height: 100vh;
+          background-color: hsl(213,70%,10%);
+        }      
+      `}</style>
+        <p id="clockBoard">
+        <style jsx>{`
+          #clockBoard{
+            margin: 0;
+            font-size: 60px;
+            color: hsl(213,100%,70%);
+            text-align: center;
+            padding: 50px 50px 0 50px
+          }
+        `}</style>
+          {this.state.clockBoard}</p>
+        <p id="cycle">
+        <style jsx>{`
+          #cycle{
+            margin: 0;
+            font-size: 30px;
+            color: hsl(213,100%,70%);
+            text-align: center;
+            padding: 10px 0 40px;
+          }
+        `}
+          
+        </style>
+          {this.state.cycle}</p>
+        <p id="button" style={this.btnStyle} onMouseEnter={this.btnHover} onMouseLeave={this.btnLeave} onClick={this.handleTimer}>
+        <style jsx>{`
+          #button {
+            font-size:15px;
+            width: 80px;
+            padding: 10px;
+            margin: 20px auto;
+            text-align: center;
+            color: #fff;
+            background-color: hsl(213,80%,60%);
+            cursor: pointer;
+          }
+          #button:hover {
+            outline: 3px solid #fff;
+            outline-offset: -3px;
+          }
+        `}</style>  
+          {this.state.btnMessage}</p>
+        <p id="button" onClick={this.resetTimer}>RESET</p>
+        <Sound url={`${process.env.PUBLIC_URL}/assets/alerm.mp3`} playStatus={this.state.status} />
+        
       </div>
     );
   }
