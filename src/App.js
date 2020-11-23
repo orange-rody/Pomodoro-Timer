@@ -8,8 +8,9 @@ class App extends Component {
     super(props);
     this.state={
       cycle:'Focus',
+      totalTime: 5,
       focusTime:5,
-      breakTime:5,
+      breakTime:10,
       sound:true,
     }
   }
@@ -17,9 +18,13 @@ class App extends Component {
   /*this.setStateの関数を実行するsetSoundというメンバー変数を定義します。
   setSound()の引数の値がstateのsoundプロパティに設定されます。*/
   setSound=(sound)=>{
+    this.setState({sound: sound});
+  }
+
+  setCycle=(cycle,time)=>{
     this.setState({
-      sound: sound
-    });
+      cycle: cycle,
+      totalTime: time});
   }
 
   render(){
@@ -32,9 +37,15 @@ class App extends Component {
         }
       `}
       </style>
-        <Timer totalTime = {this.state.focusTime} cycle={this.state.cycle} sound={this.state.sound}/>
+        <Timer cycle={this.state.cycle}
+               totalTime={this.state.totalTime}
+               focusTime={this.state.focusTime}
+               breakTime={this.state.breakTime}
+               setCycle={this.setCycle}
+               sound={this.state.sound} />
         <TimerControllers id="timer-controllers"/>
-        <AlermSound setSound={this.setSound} sound={this.state.sound} />
+        <AlermSound setSound={this.setSound} 
+                    sound={this.state.sound} />
       </div>
     );
   }

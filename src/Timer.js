@@ -6,14 +6,15 @@ class Timer extends Component{
   constructor(props){
     super(props);
     this.state={
-      cycle:props.cycle,
-      // 初期のremainTime(=残り時間)はprops.totalTimeから取得。
-      remainTime:props.totalTime,  
-      startButton:true,
-      btnMessage:'START',
-      // props.totalTimeには「秒」の合計が入っているので、60で割って「分」にする。
-      clockBoard:`${('0' + String(Math.floor(props.totalTime / 60))).slice(-2)}:${('0'+String(props.totalTime %60)).slice(-2)}`,
-      status: Sound.status.STOPPED
+      cycle: props.cycle,
+      // 初期のremainTime(=残り時間)はprops.focusTimeから取得。
+      remainTime: props.totalTime,
+      startButton: true,
+      btnMessage: 'START',
+      // props.focusTimeには「秒」の合計が入っているので、60で割って「分」にする。
+      clockBoard:`${('0'+String(Math.floor(props.totalTime/60))).slice(-2)}:${('0'+String(props.totalTime %60)).slice(-2)}`,
+      status: Sound.status.STOPPED,
+      message: props.cycle
     };
     //thisをバインドして、それぞれのメソッドが正常にthisの値を取得できるようにする。
     this.handleTimer=this.handleTimer.bind(this);
@@ -38,34 +39,51 @@ class Timer extends Component{
   }
 
   clockBoard(){
-      return(
-        `${('0' + String(Math.floor(this.state.remainTime / 60))).slice(-2)}:${('0'+String(this.state.remainTime %60)).slice(-2)}`
-      );
+    return `${('0' + String(Math.floor(this.state.remainTime / 60))).slice(-2)}:${('0'+String(this.state.remainTime %60)).slice(-2)}`;
   }
-  
+
+  finishMessage(){
+    switch(this.state.cycle){
+      case 'Focus':
+        return 'Next is "Break"';
+      case 'Break':
+        return 'Next is "Focus';
+      default: return
+    }
+  }
+
+  finishDisplay(){
+    this.setState(()=>({
+      clockBoard: 'Time Up!',
+      startButton: true,
+      btnMessage: 'START',
+      message: this.finishMessage()
+    }))
+  }
 
   startTimer(){
     //startTimerが起動したら、params()でstartButtonとbtnMessageの内容を書き換える。
     this.setState(this.params(false));
     this.setState({
+      message: this.state.cycle,
+      clockBoard: this.clockBoard(),
       status:Sound.status.STOPPED
-    })
+    });
      // setInterval()を使用し、1000ミリ秒ごとにthis.state.remainTimeが更新されるようにします。
-    this.timerId=setInterval(()=>{
+   this.timerId=setInterval(()=>{
       // remainTimeが0になったらclearInterval()で処理をストップさせます。
       if(this.state.remainTime===0){
-        this.setState({
-          clockBoard:'Time Up!!', 
-          //カウントが0になったら、ボタンの内容を「START」に切り替えます。
-          startButton:true,
-          btnMessage:'START',
-          remainTime: this.props.totalTime,
-        });
-        if(this.props.sound===true){
+        this.finishDisplay();
+        if(this.props.sound===true){this.setState({status: Sound.status.PLAYING});}
+        this.state.cycle==='Focus'?
           this.setState({
-            status: Sound.status.PLAYING
+            cycle:'Break',
+            remainTime: this.props.breakTime
+          }):
+          this.setState({
+            cycle:'Focus',
+            remainTime: this.props.focusTime
           });
-        }
         clearInterval(this.timerId);
       }else{
         this.setState((state)=>{
@@ -91,6 +109,7 @@ class Timer extends Component{
     this.setState({
       remainTime: this.props.totalTime,
       clockBoard:`${('0' + String(Math.floor(this.props.totalTime / 60))).slice(-2)}:${(('0'+String(this.props.totalTime % 60)).slice(-2))}`,
+      message: this.props.cycle
     });
     this.setState(this.params(true));
     this.setState({
@@ -107,6 +126,7 @@ class Timer extends Component{
           width: 100%;
           height: 100vh;
           background-color: hsl(213,70%,10%);
+          outline: none;
         }      
       `}</style>
         <p id="clockBoard">
@@ -120,19 +140,20 @@ class Timer extends Component{
           }
         `}</style>
           {this.state.clockBoard}</p>
-        <p id="cycle">
+        <p id="message">
         <style jsx>{`
-          #cycle{
-            margin: 0;
-            font-size: 30px;
-            color: hsl(213,100%,70%);
+          #message{
+            display:block;
+            padding-top: 0px;
+            margin: 0 auto 50px;
             text-align: center;
-            padding: 10px 0 40px;
+            color: hsl(213,100%,70%);
+            font-size: 30px;
           }
         `}
-          
         </style>
-          {this.state.cycle}</p>
+          {this.state.message}
+        </p>
         <p id="button" style={this.btnStyle} onMouseEnter={this.btnHover} onMouseLeave={this.btnLeave} onClick={this.handleTimer}>
         <style jsx>{`
           #button {
@@ -153,7 +174,6 @@ class Timer extends Component{
           {this.state.btnMessage}</p>
         <p id="button" onClick={this.resetTimer}>RESET</p>
         <Sound url={`${process.env.PUBLIC_URL}/assets/alerm.mp3`} playStatus={this.state.status} />
-        
       </div>
     );
   }
