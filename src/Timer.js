@@ -1,182 +1,152 @@
-import React, {Component} from 'react';
-//react-soundをインポートし、audioデータを再生できるようにする。
-import Sound from 'react-sound';
+import React,{Component} from 'react';
+import TimerButton from './TimerButton';
+import ForwardButton from './ForwardButton'; 
 
-class Timer extends Component{
+export default class Timer extends Component{
   constructor(props){
     super(props);
     this.state={
-      cycle: props.cycle,
-      // 初期のremainTime(=残り時間)はprops.focusTimeから取得。
-      remainTime: props.totalTime,
-      startButton: true,
-      btnMessage: 'START',
-      // props.focusTimeには「秒」の合計が入っているので、60で割って「分」にする。
-      clockBoard:`${('0'+String(Math.floor(props.totalTime/60))).slice(-2)}:${('0'+String(props.totalTime %60)).slice(-2)}`,
-      status: Sound.status.STOPPED,
-      message: props.cycle
+      remainTime:props.totalTime,
+      clockBoard:`${('0'+String(Math.floor(props.totalTime/60))).slice(-2)}
+                   :${('0'+ String(props.totalTime % 60)).slice(-2)}`,
+      startFlag:true,
+      complete:false,
+      cycle:1
     };
-    //thisをバインドして、それぞれのメソッドが正常にthisの値を取得できるようにする。
+    this.clockBoard=this.clockBoard.bind(this);
     this.handleTimer=this.handleTimer.bind(this);
     this.startTimer=this.startTimer.bind(this);
-    this.stopTimer=this.stopTimer.bind(this);
+    this.pauseTimer=this.pauseTimer.bind(this);
     this.resetTimer=this.resetTimer.bind(this);
-    this.params=this.params.bind(this);
-    this.clockBoard=this.clockBoard.bind(this);
+    this.completeTimer=this.completeTimer.bind(this);
+    this.TimerButtonRef=React.createRef();
   }
 
- //stateの真偽値によって、プロパティを変更してreturnする関数paramsを定義する
-  params(state=true){
-    return{
-      startButton: state,
-      btnMessage: state ? 'START':'STOP',
-    }
-  }
-
-  //startButtonがtrueならstartTimer()を、falseならstopTimer()を起動する。
-   handleTimer(){
-    this.state.startButton === true? this.startTimer():this.stopTimer()
-  }
-
+  //clockBoard(時計の表示)を更新するメソッド
   clockBoard(){
-    return `${('0' + String(Math.floor(this.state.remainTime / 60))).slice(-2)}:${('0'+String(this.state.remainTime %60)).slice(-2)}`;
+    return `${(0+String(Math.floor(this.state.remainTime/60))).slice(-2)}
+            :${(0+String(this.state.remainTime%60).slice(-2))}`;
   }
 
-  finishMessage(){
-    switch(this.state.cycle){
-      case 'Focus':
-        return 'Next is "Break"';
-      case 'Break':
-        return 'Next is "Focus';
-      default: return
-    }
+  handleTimer(){
+    this.state.startFlag===true?
+      this.startTimer():this.pauseTimer()
+    this.setState(state=>({
+      startFlag: !state.startFlag
+    }));
   }
 
-  finishDisplay(){
-    this.setState(()=>({
-      clockBoard: 'Time Up!',
-      startButton: true,
-      btnMessage: 'START',
-      message: this.finishMessage()
+  completeTimer(boolean){
+    this.setState({complete: boolean});
+  }
+
+  changeCycle=()=>{
+    this.setState((state)=>({
+      cycle: state.cycle+1
     }))
   }
 
-  startTimer(){
-    //startTimerが起動したら、params()でstartButtonとbtnMessageの内容を書き換える。
-    this.setState(this.params(false));
-    this.setState({
-      message: this.state.cycle,
-      clockBoard: this.clockBoard(),
-      status:Sound.status.STOPPED
-    });
-     // setInterval()を使用し、1000ミリ秒ごとにthis.state.remainTimeが更新されるようにします。
-   this.timerId=setInterval(()=>{
-      // remainTimeが0になったらclearInterval()で処理をストップさせます。
-      if(this.state.remainTime===0){
-        this.finishDisplay();
-        if(this.props.sound===true){this.setState({status: Sound.status.PLAYING});}
-        this.state.cycle==='Focus'?
-          this.setState({
-            cycle:'Break',
-            remainTime: this.props.breakTime
-          }):
-          this.setState({
-            cycle:'Focus',
-            remainTime: this.props.focusTime
-          });
-        clearInterval(this.timerId);
-      }else{
-        this.setState((state)=>{
-          return{
-            remainTime:--state.remainTime,
-            clockBoard: this.clockBoard()
-          }
-        })
-      }
-    },1000);
+  setTimer(){
+    const cycle = this.state.cycle;
+    switch(cycle){
+      case 1:
+        this.setState({
+          remainTime: this.props.breakTime,
+          clockBoard:`${('0'+String(Math.floor(this.props.breakTime/60))).slice(-2)}
+                 :${('0'+ String(this.props.breakTime % 60)).slice(-2)}`
+        });
+        break;
+      case 2:
+        this.setState({
+          remainTime: this.props.focusTime,
+          clockBoard:`${('0'+String(Math.floor(this.props.focusTime/60))).slice(-2)}
+                  :${('0'+ String(this.props.focusTime % 60)).slice(-2)}`
+        });
+        break;
+      case 3:
+        this.setState({
+          remainTime: this.props.breakTime,
+          clockBoard:`${('0'+String(Math.floor(this.props.breakTime/60))).slice(-2)}
+                 :${('0'+ String(this.props.breakTime % 60)).slice(-2)}`
+        });
+        break;
+      case 4:
+        this.setState({
+          remainTime: this.props.focusTime,
+          clockBoard:`${('0'+String(Math.floor(this.props.focusTime/60))).slice(-2)}
+                  :${('0'+ String(this.props.focusTime % 60)).slice(-2)}`
+        });
+        break;
+      case 5:
+        this.setState({
+          remainTime: this.props.longBreak,
+          clockBoard:`${('0'+String(Math.floor(this.props.longBreak/60))).slice(-2)}
+          :${('0'+ String(this.props.longBreak % 60)).slice(-2)}`,
+          cycle:1
+        });
+        break;
+      default:
+        return;
+    }
   }
 
-  stopTimer(){
-    //stopTimerが起動したら、params()でstartButtonとbtnMessageの内容を書き換える。
-    this.setState(this.params(true));
-    //clearIntervalでカウントダウン処理をストップさせる。
+  startTimer(){
+    this.TimerButtonRef.current.pushStart();
+    if(this.state.remainTime===0){
+      this.setTimer();
+      this.changeCycle();
+    }
+    this.timerId=setInterval(()=>{
+      if(this.state.remainTime===0){
+        this.setState({
+          clockBoard: 'Time Up!!',
+        });
+        this.completeTimer(true);
+        this.handleTimer();
+      }
+      else{
+        this.setState((state)=>{
+          return({
+            remainTime:--state.remainTime,
+            clockBoard:this.clockBoard()
+          });
+        });
+      }
+    },1000)
+  }
+
+  pauseTimer(){
     clearInterval(this.timerId);
+    this.TimerButtonRef.current.pushStart();
   }
 
   resetTimer(){
-    //resetTimerが起動したら、setIntervalの処理をストップさせた後、stateの内容を切り替える。
-    clearInterval(this.timerId);
+    this.TimerButtonRef.current.pushReset();
     this.setState({
-      remainTime: this.props.totalTime,
-      clockBoard:`${('0' + String(Math.floor(this.props.totalTime / 60))).slice(-2)}:${(('0'+String(this.props.totalTime % 60)).slice(-2))}`,
-      message: this.props.cycle
+      remainTime:this.props.totalTime,
+      clockBoard:`${('0'+String(Math.floor(this.props.totalTime/60))).slice(-2)}
+                  :${('0'+ String(this.props.totalTime % 60)).slice(-2)}`,
+      startFlag:true 
     });
-    this.setState(this.params(true));
-    this.setState({
-      status: Sound.status.STOPPED
-    })
-  };
-  
+    clearInterval(this.timerId);
+  }
 
   render(){
     return(
-      <div className={this.props.className}> 
-      <style jsx>{`
-        div{
-          width: 100%;
-          height: 100vh;
-          background-color: hsl(213,70%,10%);
-          outline: none;
-        }      
-      `}</style>
-        <p id="clockBoard">
+      <div>
+        <div id='clockBoard'>
         <style jsx>{`
           #clockBoard{
-            margin: 0;
-            font-size: 60px;
-            color: hsl(213,100%,70%);
-            text-align: center;
-            padding: 50px 50px 0 50px
+            display: block;
+            font-size:40px;
+            color: hsl(230,100%,70%);
           }
         `}</style>
-          {this.state.clockBoard}</p>
-        <p id="message">
-        <style jsx>{`
-          #message{
-            display:block;
-            padding-top: 0px;
-            margin: 0 auto 50px;
-            text-align: center;
-            color: hsl(213,100%,70%);
-            font-size: 30px;
-          }
-        `}
-        </style>
-          {this.state.message}
-        </p>
-        <p id="button" style={this.btnStyle} onMouseEnter={this.btnHover} onMouseLeave={this.btnLeave} onClick={this.handleTimer}>
-        <style jsx>{`
-          #button {
-            font-size:15px;
-            width: 80px;
-            padding: 10px;
-            margin: 20px auto;
-            text-align: center;
-            color: #fff;
-            background-color: hsl(213,80%,60%);
-            cursor: pointer;
-          }
-          #button:hover {
-            outline: 3px solid #fff;
-            outline-offset: -3px;
-          }
-        `}</style>  
-          {this.state.btnMessage}</p>
-        <p id="button" onClick={this.resetTimer}>RESET</p>
-        <Sound url={`${process.env.PUBLIC_URL}/assets/alerm.mp3`} playStatus={this.state.status} />
+          {this.state.clockBoard}
+        </div>
+        <TimerButton handleTimer={this.handleTimer} resetTimer={this.resetTimer} ref={this.TimerButtonRef} />
+        <ForwardButton/>
       </div>
-    );
+    )
   }
 }
-
-export default Timer;
