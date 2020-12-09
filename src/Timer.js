@@ -1,14 +1,12 @@
 import React,{Component} from 'react';
 import TimerButton from './TimerButton';
-import ForwardButton from './ForwardButton'; 
 
 export default class Timer extends Component{
   constructor(props){
     super(props);
     this.state={
       remainTime:props.totalTime,
-      clockBoard:`${('0'+String(Math.floor(props.totalTime/60))).slice(-2)}
-                   :${('0'+ String(props.totalTime % 60)).slice(-2)}`,
+      clockBoard:`${('0'+String(Math.floor(props.totalTime/60))).slice(-2)}:${('0'+ String(props.totalTime % 60)).slice(-2)}`,
       startFlag:true,
       complete:false,
       cycle:1
@@ -24,8 +22,7 @@ export default class Timer extends Component{
 
   //clockBoard(時計の表示)を更新するメソッド
   clockBoard(){
-    return `${(0+String(Math.floor(this.state.remainTime/60))).slice(-2)}
-            :${(0+String(this.state.remainTime%60).slice(-2))}`;
+    return `${(0+String(Math.floor(this.state.remainTime/60))).slice(-2)}:${(0+String(this.state.remainTime%60).slice(-2))}`;
   }
 
   handleTimer(){
@@ -50,38 +47,28 @@ export default class Timer extends Component{
     const cycle = this.state.cycle;
     switch(cycle){
       case 1:
+      case 3:
         this.setState({
           remainTime: this.props.breakTime,
-          clockBoard:`${('0'+String(Math.floor(this.props.breakTime/60))).slice(-2)}
-                 :${('0'+ String(this.props.breakTime % 60)).slice(-2)}`
+          clockBoard:`${('0'+String(Math.floor(this.props.breakTime/60))).slice(-2)}:${('0'+ String(this.props.breakTime % 60)).slice(-2)}`
         });
         break;
       case 2:
         this.setState({
           remainTime: this.props.focusTime,
-          clockBoard:`${('0'+String(Math.floor(this.props.focusTime/60))).slice(-2)}
-                  :${('0'+ String(this.props.focusTime % 60)).slice(-2)}`
-        });
-        break;
-      case 3:
-        this.setState({
-          remainTime: this.props.breakTime,
-          clockBoard:`${('0'+String(Math.floor(this.props.breakTime/60))).slice(-2)}
-                 :${('0'+ String(this.props.breakTime % 60)).slice(-2)}`
+          clockBoard:`${('0'+String(Math.floor(this.props.focusTime/60))).slice(-2)}:${('0'+ String(this.props.focusTime % 60)).slice(-2)}`
         });
         break;
       case 4:
         this.setState({
           remainTime: this.props.focusTime,
-          clockBoard:`${('0'+String(Math.floor(this.props.focusTime/60))).slice(-2)}
-                  :${('0'+ String(this.props.focusTime % 60)).slice(-2)}`
+          clockBoard:`${('0'+String(Math.floor(this.props.focusTime/60))).slice(-2)}:${('0'+ String(this.props.focusTime % 60)).slice(-2)}`
         });
         break;
       case 5:
         this.setState({
           remainTime: this.props.longBreak,
-          clockBoard:`${('0'+String(Math.floor(this.props.longBreak/60))).slice(-2)}
-          :${('0'+ String(this.props.longBreak % 60)).slice(-2)}`,
+          clockBoard:`${('0'+String(Math.floor(this.props.longBreak/60))).slice(-2)}:${('0'+ String(this.props.longBreak % 60)).slice(-2)}`,
           cycle:1
         });
         break;
@@ -124,8 +111,7 @@ export default class Timer extends Component{
     this.TimerButtonRef.current.pushReset();
     this.setState({
       remainTime:this.props.totalTime,
-      clockBoard:`${('0'+String(Math.floor(this.props.totalTime/60))).slice(-2)}
-                  :${('0'+ String(this.props.totalTime % 60)).slice(-2)}`,
+      clockBoard:`${('0'+String(Math.floor(this.props.totalTime/60))).slice(-2)}:${('0'+ String(this.props.totalTime % 60)).slice(-2)}`,
       startFlag:true 
     });
     clearInterval(this.timerId);
@@ -134,18 +120,30 @@ export default class Timer extends Component{
   render(){
     return(
       <div>
+      <style jsx>{`
+        div{
+          width: 100%;
+          display:flex;
+          justify-content: center;
+          flex-direction:column;
+        }
+      `}</style>
         <div id='clockBoard'>
         <style jsx>{`
           #clockBoard{
+            font-family: 'Roboto Mono', monospace;
             display: block;
-            font-size:40px;
-            color: hsl(230,100%,70%);
+            font-size:130px;
+            text-align: center;
           }
         `}</style>
           {this.state.clockBoard}
         </div>
-        <TimerButton handleTimer={this.handleTimer} resetTimer={this.resetTimer} ref={this.TimerButtonRef} />
-        <ForwardButton/>
+        <div id='timerButton'>
+        <style jsx>{`
+        `}</style>
+          <TimerButton id='timerButton' handleTimer={this.handleTimer} resetTimer={this.resetTimer} ref={this.TimerButtonRef}/>
+        </div>
       </div>
     )
   }

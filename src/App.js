@@ -20,7 +20,15 @@ class App extends Component {
 
   render(){
     return(
-      <div>
+      <div id="wrap">
+      <style jsx>{`
+        #wrap{
+          background-image: radial-gradient(hsla(166,43%,57%,40%) 10%,rgba(255,255,255,0) 10%);
+          background-size: 10px 10px;
+          width: 100%;
+          height: 100%;
+        }
+      `}</style>
         <Timer totalTime={this.state.totalTime} focusTime={this.state.focusTime} breakTime={this.state.breakTime} longBreak={this.state.longBreak}/>
       </div>
     );
