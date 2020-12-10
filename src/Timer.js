@@ -1,15 +1,17 @@
 import React,{Component} from 'react';
 import TimerButton from './TimerButton';
+import AlermSound from './AlermSound';
+
 
 export default class Timer extends Component{
   constructor(props){
     super(props);
     this.state={
-      remainTime:props.totalTime,
-      clockBoard:`${('0'+String(Math.floor(props.totalTime/60))).slice(-2)}:${('0'+ String(props.totalTime % 60)).slice(-2)}`,
-      startFlag:true,
-      complete:false,
-      cycle:1
+      remainTime: props.totalTime,
+      clockBoard: `${('0'+String(Math.floor(props.totalTime/60))).slice(-2)}:${('0'+ String(props.totalTime % 60)).slice(-2)}`,
+      startFlag: true,
+      complete: false,
+      cycle: 1,
     };
     this.clockBoard=this.clockBoard.bind(this);
     this.handleTimer=this.handleTimer.bind(this);
@@ -18,6 +20,7 @@ export default class Timer extends Component{
     this.resetTimer=this.resetTimer.bind(this);
     this.completeTimer=this.completeTimer.bind(this);
     this.TimerButtonRef=React.createRef();
+    this.AlermSoundRef=React.createRef();
   }
 
   //clockBoard(時計の表示)を更新するメソッド
@@ -54,11 +57,6 @@ export default class Timer extends Component{
         });
         break;
       case 2:
-        this.setState({
-          remainTime: this.props.focusTime,
-          clockBoard:`${('0'+String(Math.floor(this.props.focusTime/60))).slice(-2)}:${('0'+ String(this.props.focusTime % 60)).slice(-2)}`
-        });
-        break;
       case 4:
         this.setState({
           remainTime: this.props.focusTime,
@@ -79,6 +77,7 @@ export default class Timer extends Component{
 
   startTimer(){
     this.TimerButtonRef.current.pushStart();
+    this.AlermSoundRef.current.stopAlerm();
     if(this.state.remainTime===0){
       this.setTimer();
       this.changeCycle();
@@ -89,6 +88,7 @@ export default class Timer extends Component{
           clockBoard: 'Time Up!!',
         });
         this.completeTimer(true);
+        this.AlermSoundRef.current.doAlerm();
         this.handleTimer();
       }
       else{
@@ -143,6 +143,7 @@ export default class Timer extends Component{
         <style jsx>{`
         `}</style>
           <TimerButton id='timerButton' handleTimer={this.handleTimer} resetTimer={this.resetTimer} ref={this.TimerButtonRef}/>
+          <AlermSound id='AlermSound' ref={this.AlermSoundRef} />
         </div>
       </div>
     )

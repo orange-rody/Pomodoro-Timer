@@ -1,47 +1,69 @@
-
 import React, {Component} from 'react';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faVolumeUp} from '@fortawesome/free-solid-svg-icons';
+import {faVolumeOff} from '@fortawesome/free-solid-svg-icons';
+import Sound from 'react-sound';
 
-class AlermSound extends Component{
-  
-  toggleSound=(e)=>{
-    /*propsのsoundプロパティが「on」なら、「'off'」を引数にしてpropsのsetSound('off')を実行します。propsのsoundプロパティが「off」なら、「'on'」を引数にしてpropsのsetSound('on')を実行します。*/
-    this.props.sound===true?
-    this.changeSoundAttributes(false,`${process.env.PUBLIC_URL}/assets/soundOff.png`,e)
-    :
-    this.changeSoundAttributes(true,`${process.env.PUBLIC_URL}/assets/soundOn.png`,e)
+export default class AlermSound extends Component{
+  constructor(props){
+    super(props);
+    this.state={
+      sound:true,
+      soundIcon: <FontAwesomeIcon icon={faVolumeUp}/>,
+      status: Sound.status.STOPPED
+    }
+    this.toggleSound=this.toggleSound.bind(this);
+    this.changeSoundAttributes=this.changeSoundAttributes.bind(this);
+    this.doAlerm=this.doAlerm.bind(this);
   }
 
-  changeSoundAttributes = (toggle,src,e)=>{
-    this.props.setSound(toggle);
-    e.target.src=src ;
+  toggleSound=(e)=>{
+    this.state.sound===true?
+    this.changeSoundAttributes(false,<FontAwesomeIcon icon={faVolumeOff} />,e):this.changeSoundAttributes(true,<FontAwesomeIcon icon={faVolumeUp} />,e)
+  }
+
+
+  changeSoundAttributes=(toggle,soundIcon,e)=>{
+    this.setState({
+      sound: toggle,
+      soundIcon: soundIcon,
+    });
+  }
+
+  doAlerm(){
+    this.state.sound===true?
+    this.setState({status: Sound.status.PLAYING}):this.setState({status: Sound.status.STOPPED})
+  }
+
+  stopAlerm(){
+    this.setState({status: Sound.status.STOPPED});
   }
 
   render(){
     return(
-      <label for="soundIcon" id="soundBtn">
+      <div id="soundBtn" onClick={this.toggleSound} alt="sound on">
       <style jsx>{`
-        #soundBtn {
+        #soundBtn{
           position: absolute;
-          top: 80%;
-          left: 250px;
-          border-radius: 100%;
-          display: block;
-          background-color: hsl(213,80%,60%);
+          bottom: 0;
+          width: 100px;
+          height: 100px;
+          margin-left: 20px;
         }
       `}</style>
-        <img id="soundIcon" src={`${process.env.PUBLIC_URL}/assets/soundOn.png`} onClick={this.toggleSound} alt="sound on"/>
+      <Sound url={`${process.env.PUBLIC_URL}/assets/alerm.mp3`} playStatus={this.state.status} />
+        <p id="soundIcon">
         <style jsx>{`
-          #soundIcon {
-            width: 50px;
-            height: 50px;
-            display: inline-block;
-            padding:20px;
+          #soundIcon{
+            margin-left: 20px;
+            line-height: 100px;
+            font-size: 50px;
           }
-        `}
-        </style>
-      </label>
+        `}</style>
+            {this.state.soundIcon}
+        </p>
+      </div>
     );
   }
 }
 
-export default AlermSound;

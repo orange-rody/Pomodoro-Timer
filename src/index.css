@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@1,200&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@1,200;1,400;1,500&display=swap');
 
 body{
   margin: 0;
-  background-color: hsl(247,38%,5%);
+  background: radial-gradient(hsl(247,38%,20%),hsl(247,30%,5%));
   color:  hsl(166,43%,57%);
-  text-shadow: 4px 1px hsl(332,76%,61%);
+  text-shadow: 4px 3px hsl(332,76%,61%);
   width: 100vw;
   height: 100vh;
 }

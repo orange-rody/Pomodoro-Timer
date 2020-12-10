@@ -7,7 +7,6 @@ class App extends Component {
     this.state={
       cycle:1,
       totalTime:5,
-      sound:true,
       focusTime:5,
       breakTime:3,
       longBreak:10,
