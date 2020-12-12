@@ -1,12 +1,14 @@
 import React,{Component} from 'react';
 import TimerButton from './TimerButton';
 import AlermSound from './AlermSound';
+import ForwardButton from './ForwardButton';
 
 
 export default class Timer extends Component{
   constructor(props){
     super(props);
     this.state={
+      session:'Focus',
       remainTime: props.totalTime,
       clockBoard: `${('0'+String(Math.floor(props.totalTime/60))).slice(-2)}:${('0'+ String(props.totalTime % 60)).slice(-2)}`,
       startFlag: true,
@@ -25,7 +27,7 @@ export default class Timer extends Component{
 
   //clockBoard(時計の表示)を更新するメソッド
   clockBoard(){
-    return `${(0+String(Math.floor(this.state.remainTime/60))).slice(-2)}:${(0+String(this.state.remainTime%60).slice(-2))}`;
+    return `${(0+String(Math.floor(this.state.remainTime/60))).slice(-2)}:${((0+String(this.state.remainTime%60)).slice(-2))}`;
   }
 
   handleTimer(){
@@ -52,6 +54,7 @@ export default class Timer extends Component{
       case 1:
       case 3:
         this.setState({
+          session: 'Break',
           remainTime: this.props.breakTime,
           clockBoard:`${('0'+String(Math.floor(this.props.breakTime/60))).slice(-2)}:${('0'+ String(this.props.breakTime % 60)).slice(-2)}`
         });
@@ -59,12 +62,14 @@ export default class Timer extends Component{
       case 2:
       case 4:
         this.setState({
+          session: 'Focus',
           remainTime: this.props.focusTime,
           clockBoard:`${('0'+String(Math.floor(this.props.focusTime/60))).slice(-2)}:${('0'+ String(this.props.focusTime % 60)).slice(-2)}`
         });
         break;
       case 5:
         this.setState({
+          session: 'Long Break',
           remainTime: this.props.longBreak,
           clockBoard:`${('0'+String(Math.floor(this.props.longBreak/60))).slice(-2)}:${('0'+ String(this.props.longBreak % 60)).slice(-2)}`,
           cycle:1
@@ -77,7 +82,6 @@ export default class Timer extends Component{
 
   startTimer(){
     this.TimerButtonRef.current.pushStart();
-    this.AlermSoundRef.current.stopAlerm();
     if(this.state.remainTime===0){
       this.setTimer();
       this.changeCycle();
@@ -88,7 +92,7 @@ export default class Timer extends Component{
           clockBoard: 'Time Up!!',
         });
         this.completeTimer(true);
-        this.AlermSoundRef.current.doAlerm();
+        this.AlermSoundRef.current.AudioPlay();
         this.handleTimer();
       }
       else{
@@ -128,16 +132,35 @@ export default class Timer extends Component{
           flex-direction:column;
         }
       `}</style>
-        <div id='clockBoard'>
+        <div id="session">
         <style jsx>{`
-          #clockBoard{
+          #session{
             font-family: 'Roboto Mono', monospace;
-            display: block;
-            font-size:130px;
+            width: 40%;
+            margin: 0 auto;
             text-align: center;
+            font-size: 50px;
+            border-radius: 100%;
           }
         `}</style>
-          {this.state.clockBoard}
+          {this.state.session}
+        </div>
+        <div id="timerWrap">
+          <div id="backButton"></div>
+          <div id='clockBoard'>
+          <style jsx>{`
+            #clockBoard{
+              font-family: 'Roboto Mono', monospace;
+              display: block;
+              font-size:130px;
+              text-align: center;
+            }
+          `}</style>
+            {this.state.clockBoard}
+          </div>
+          <div id="forWardButton">
+            <ForwardButton/>
+          </div>
         </div>
         <div id='timerButton'>
         <style jsx>{`

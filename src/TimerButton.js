@@ -3,7 +3,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faPlay} from '@fortawesome/free-solid-svg-icons';
 import {faPause} from '@fortawesome/free-solid-svg-icons';
 import {faRedoAlt} from '@fortawesome/free-solid-svg-icons';
-import Sound from 'react-sound';
+
 
 export default class TimerButton extends Component{
   constructor(props){
@@ -12,11 +12,10 @@ export default class TimerButton extends Component{
       startButton:true,
       startIcon: <FontAwesomeIcon icon={faPlay}/>,
       resetIcon: <FontAwesomeIcon icon={faRedoAlt}/>,
-      status: Sound.status.STOPPED
+
     }
     this.pushStart=this.pushStart.bind(this);
     this.pushReset=this.pushReset.bind(this);
-    this.stopSound=this.stopSound.bind(this);
   }
 
   pushStart=()=>{
@@ -28,7 +27,6 @@ export default class TimerButton extends Component{
     this.setState({
       startButton:false,
       startIcon:<FontAwesomeIcon icon={faPause} />,
-      status: Sound.status.PLAYING
     })
     :this.setState({
       startButton:true,
@@ -41,10 +39,6 @@ export default class TimerButton extends Component{
       startButton:true,
       startIcon:<FontAwesomeIcon icon={faPlay} />
     }) 
-  }
-
-  stopSound(){
-    setTimeout(this.setState({status:Sound.status.STOPPED}),1000);
   }
 
   render(){
@@ -95,8 +89,8 @@ export default class TimerButton extends Component{
             
           }
         `}</style>
-          {this.state.resetIcon}</p>
-          <Sound url={`${process.env.PUBLIC_URL}/assets/cursor1.mp3`} />
+          {this.state.resetIcon}
+        </p>       
       </div>
     );
   }

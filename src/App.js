@@ -9,7 +9,7 @@ class App extends Component {
       totalTime:5,
       focusTime:5,
       breakTime:3,
-      longBreak:10,
+      longBreak:6,
     }  
   }
 

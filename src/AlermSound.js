@@ -2,42 +2,43 @@ import React, {Component} from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faVolumeUp} from '@fortawesome/free-solid-svg-icons';
 import {faVolumeOff} from '@fortawesome/free-solid-svg-icons';
-import Sound from 'react-sound';
 
 export default class AlermSound extends Component{
   constructor(props){
     super(props);
     this.state={
-      sound:true,
+      sound: true,
       soundIcon: <FontAwesomeIcon icon={faVolumeUp}/>,
-      status: Sound.status.STOPPED
+      src: `${process.env.PUBLIC_URL}/assets/alerm.mp3`
     }
     this.toggleSound=this.toggleSound.bind(this);
     this.changeSoundAttributes=this.changeSoundAttributes.bind(this);
-    this.doAlerm=this.doAlerm.bind(this);
   }
 
-  toggleSound=(e)=>{
+  toggleSound=()=>{
     this.state.sound===true?
-    this.changeSoundAttributes(false,<FontAwesomeIcon icon={faVolumeOff} />,e):this.changeSoundAttributes(true,<FontAwesomeIcon icon={faVolumeUp} />,e)
+    this.changeSoundAttributes(false,<FontAwesomeIcon icon={faVolumeOff} />,false):this.changeSoundAttributes(true,<FontAwesomeIcon icon={faVolumeUp} />,true)
   }
 
 
-  changeSoundAttributes=(toggle,soundIcon,e)=>{
+  changeSoundAttributes=(toggle,soundIcon)=>{
     this.setState({
       sound: toggle,
       soundIcon: soundIcon,
     });
   }
 
-  doAlerm(){
-    this.state.sound===true?
-    this.setState({status: Sound.status.PLAYING}):this.setState({status: Sound.status.STOPPED})
+  AudioPlay(){
+    const audio = document.getElementById('audio');
+    if(this.state.sound===true){
+      audio.volume=0.2;
+      audio.play();
+    }else{
+      audio.pause();
+      audio.currentTime=0;
+    }
   }
 
-  stopAlerm(){
-    this.setState({status: Sound.status.STOPPED});
-  }
 
   render(){
     return(
@@ -51,7 +52,6 @@ export default class AlermSound extends Component{
           margin-left: 20px;
         }
       `}</style>
-      <Sound url={`${process.env.PUBLIC_URL}/assets/alerm.mp3`} playStatus={this.state.status} />
         <p id="soundIcon">
         <style jsx>{`
           #soundIcon{
@@ -62,6 +62,7 @@ export default class AlermSound extends Component{
         `}</style>
             {this.state.soundIcon}
         </p>
+        <audio src={this.state.src} id="audio" />
       </div>
     );
   }
