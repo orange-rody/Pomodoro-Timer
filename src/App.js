@@ -6,11 +6,11 @@ class App extends Component {
     super(props);
     this.state={
       cycle:1,
-      totalTime:5,
+      totalTime:20,
       sound:true,
-      focusTime:5,
-      breakTime:3,
-      longBreak:10,
+      focusTime:20,
+      breakTime:30,
+      longBreak:20,
     }  
   }
 
