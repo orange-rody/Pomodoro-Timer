@@ -42,19 +42,12 @@ export default class AlermSound extends Component{
 
   render(){
     return(
-      <div id="soundBtn" onClick={this.toggleSound} alt="sound on">
-      <style jsx>{`
-        #soundBtn{
-          position: absolute;
-          bottom: 0;
-          width: 100px;
-          height: 100px;
-          margin-left: 20px;
-        }
-      `}</style>
-        <p id="soundIcon">
+      <div>
+        <p id="soundBtn" onClick={this.toggleSound}>
         <style jsx>{`
-          #soundIcon{
+          #soundBtn{
+            position: absolute;
+            bottom: 0;
             margin-left: 20px;
             line-height: 100px;
             font-size: 50px;

@@ -1,7 +1,6 @@
 import React,{Component} from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faStepForward} from '@fortawesome/free-solid-svg-icons';
-import {faStepBack} from '@fortawesome/free-solid-svg-icons';
 
 export default class ForwardButton extends Component{
   constructor(props){
@@ -13,8 +12,10 @@ export default class ForwardButton extends Component{
   render(){
     return(
     <div id="forwardButton">
-      <FontAwesomeIcon icon={faStepForward} />
+      <FontAwesomeIcon icon={faStepForward} onClick={this.props.skipForward}/>
     </div>
     );
   }
 } 
+
+

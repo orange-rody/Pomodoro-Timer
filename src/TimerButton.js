@@ -9,10 +9,9 @@ export default class TimerButton extends Component{
   constructor(props){
     super(props);
     this.state={
-      startButton:true,
+      startFlag: true,
       startIcon: <FontAwesomeIcon icon={faPlay}/>,
       resetIcon: <FontAwesomeIcon icon={faRedoAlt}/>,
-
     }
     this.pushStart=this.pushStart.bind(this);
     this.pushReset=this.pushReset.bind(this);
@@ -22,21 +21,21 @@ export default class TimerButton extends Component{
     /* this.state.startIcon===<FontAwesomeIcon icon={faPlayCircle}?
           this.setState({startIcon:<FontAwesomeIcon icon={faPauseCircle}/>})
           :this.setState({startIcon:<FontAwesomeIcon icn={faPlayCircle}/>})
-       と書いたら上手くいかなかったので、({startButton:true})というプロパティを作った。 */
-    this.state.startButton===true?
+       と書いたら上手くいかなかった。 */
+    this.state.startFlag===true?
     this.setState({
-      startButton:false,
+      startFlag: false,
       startIcon:<FontAwesomeIcon icon={faPause} />,
-    })
+    },console.log(this.state.startFlag))
     :this.setState({
-      startButton:true,
+      startFlag: true,
       startIcon:<FontAwesomeIcon icon={faPlay} />
-    })
+    },console.log(this.state.startFlag))
   }
 
   pushReset=()=>{
     this.setState({
-      startButton:true,
+      startFlag: true,
       startIcon:<FontAwesomeIcon icon={faPlay} />
     }) 
   }
@@ -53,7 +52,7 @@ export default class TimerButton extends Component{
           margin: 0 auto;
         }
       `}</style>
-        <p id="startButton" onClick={this.props.handleTimer} >{this.state.startIcon}
+        <p id="startButton" onClick={this.props.handleTimer}>
         <style jsx>{`
           #startButton{
             width: 100px;
@@ -69,7 +68,8 @@ export default class TimerButton extends Component{
           #startButton:active{
             background-color: hsl(166,43%,80%);
           }
-        `}</style>
+          `}</style>
+          {this.state.startIcon}
         </p>
         <p id="resetButton" onClick={this.props.resetTimer} >
         <style jsx>{`
@@ -85,8 +85,7 @@ export default class TimerButton extends Component{
             transition: all 0.1s linear;
           }
           #resetButton:active{
-            background-color: hsl(166,43%,80%);
-            
+            background-color: hsl(166,43%,80%);     
           }
         `}</style>
           {this.state.resetIcon}
