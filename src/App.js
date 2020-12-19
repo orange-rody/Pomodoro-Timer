@@ -27,6 +27,10 @@ export default class App extends Component {
     this.skipForward=this.skipForward.bind(this);
   }
   
+  componentDidMount(){
+    this.setState(this.setTime());
+  }
+
   // changeCycleはcycleをインクリメントするメソッド
   changeCycle(){
     this.state.cycle===5?
@@ -96,7 +100,6 @@ export default class App extends Component {
       }
     },1000);
   }
-
   pauseTimer(){
     clearInterval(this.timerId);
   }
@@ -117,6 +120,7 @@ export default class App extends Component {
       this.setState({cycle: nextCycle});
       this.resetTimer();
     }
+    console.log(this.state.cycle);
   }
 
   render(){
